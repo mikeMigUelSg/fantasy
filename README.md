@@ -129,14 +129,44 @@ const EUROS_POR_JORNADA = 1;    // quanto paga cada um
 
 ```
 external/
-├── index.html          a app (HTML + CSS + JS, sem dependências)
-├── data.json           dados embutidos, gerados por atualizar.py
-├── atualizar.py        regenera o data.json a partir da API da Liga
+├── index.html            a app (HTML + CSS + JS, sem dependências)
+├── data.json             dados embutidos, gerados por atualizar.py
+├── atualizar.py          regenera o data.json a partir da API da Liga
+├── logo.png              emblema, 512px (cabeçalho)
+├── favicon.ico           ícone do separador (16/32/48/64)
+├── apple-touch-icon.png  ícone de ecrã principal do iOS, 180px
+├── og.png                imagem das pré-visualizações de links, 1200×630
 ├── api/
-│   └── standings.js    função serverless: proxy para contornar o CORS
-├── vercel.json         configuração da função
-└── package.json        marca o projeto como ESM
+│   └── standings.js      função serverless: proxy para contornar o CORS
+├── vercel.json           configuração da função
+└── package.json          marca o projeto como ESM
 ```
+
+## Logo e ícones
+
+O `logo.png` original tinha 1,9 MB e uma moldura preta retangular à volta do
+emblema circular — o que ficava mal no fundo claro da página. Foi recortado ao
+anel dourado, mascarado a círculo com transparência (assenta bem em tema claro
+ou escuro) e reduzido para 512px com paleta adaptativa: **1,9 MB → 75 KB**, sem
+perda visível.
+
+O `apple-touch-icon.png` leva fundo opaco de propósito — o iOS não respeita
+transparência e desenharia um fundo preto por baixo na mesma.
+
+Para substituir o emblema, troca o `logo.png` (quadrado, de preferência já
+recortado ao círculo) e regenera os restantes a partir dele.
+
+## Telemóvel
+
+O layout está ajustado abaixo dos 640px, onde três coisas partiam:
+
+- a coluna fixa das equipas ocupava 248 de 390px, sobrando espaço para duas
+  jornadas — passou a 132px, com o nome do treinador numa segunda linha, e
+  ficam visíveis 7 jornadas;
+- as barras do gráfico ficavam com poucos píxeis porque o rótulo levava 208px —
+  o rótulo passou para cima da barra, que agora ocupa a largura toda;
+- os botões tinham 32px de altura, abaixo do mínimo confortável para o dedo —
+  passaram a 44px.
 
 ## Estado atual dos dados
 
