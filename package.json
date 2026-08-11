@@ -1,0 +1,7 @@
+{
+  "name": "liga-dos-ultimos",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Classificacao por jornada da Fantasy Liga Portugal",
+  "type": "module"
+}

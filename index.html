@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="pt">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Liga dos Últimos — Classificação por Jornada</title>
+<style>
+  :root {
+    --fundo: #f4f6f8;
+    --painel: #ffffff;
+    --texto: #1a2027;
+    --suave: #6b7684;
+    --linha: #d8dee6;
+    --cabecalho: #fce7d2;
+    --equipa: #e8e4dd;
+    --celula: #dbe8f7;
+    --total: #d8ecd9;
+    --bom: #4caf50;
+    --mau: #e8623c;
+    --destaque: #fff3bf;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --fundo: #14171c; --painel: #1c2027; --texto: #e6e9ed; --suave: #97a1ae;
+      --linha: #2e343d; --cabecalho: #4a3826; --equipa: #2b2f36; --celula: #223047;
+      --total: #24402a; --destaque: #4a4326;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 24px 16px 60px;
+    background: var(--fundo); color: var(--texto);
+    font-family: "Source Sans 3", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+  .envolve { max-width: 1600px; margin: 0 auto; }
+  h1 { font-size: 1.5rem; margin: 0 0 4px; letter-spacing: -0.01em; }
+  .sub { color: var(--suave); font-size: .875rem; margin-bottom: 18px; }
+  .barra { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 16px; }
+  button {
+    font: inherit; font-size: .85rem; padding: 7px 14px; cursor: pointer;
+    border: 1px solid var(--linha); border-radius: 7px;
+    background: var(--painel); color: var(--texto);
+  }
+  button:hover:not(:disabled) { border-color: var(--suave); }
+  button:disabled { opacity: .55; cursor: default; }
+  button.ativo { background: var(--texto); color: var(--painel); border-color: var(--texto); }
+  .estado { font-size: .8rem; color: var(--suave); }
+
+  .painel {
+    background: var(--painel); border: 1px solid var(--linha);
+    border-radius: 10px; overflow: hidden;
+  }
+  /* A tabela e larga (34 jornadas): rola dentro do painel, nunca a pagina. */
+  .rolar { overflow-x: auto; }
+  table { border-collapse: separate; border-spacing: 0; font-size: .82rem; width: max-content; min-width: 100%; }
+  th, td { border-right: 1px solid var(--linha); border-bottom: 1px solid var(--linha); padding: 7px 9px; text-align: center; white-space: nowrap; }
+  thead th { background: var(--cabecalho); font-weight: 600; position: sticky; top: 0; z-index: 2; }
+
+  /* Coluna da equipa fixa a esquerda, como no teu ficheiro. */
+  .equipa-col { text-align: left; background: var(--equipa); position: sticky; left: 0; z-index: 1; min-width: 230px; font-weight: 500; }
+  thead .equipa-col { z-index: 3; }
+  .jogador { color: var(--suave); font-weight: 400; }
+
+  td.jornada { background: var(--celula); font-variant-numeric: tabular-nums; }
+  td.vazia { background: var(--celula); opacity: .45; }
+  td.total { background: var(--total); font-weight: 700; font-variant-numeric: tabular-nums; }
+  th.total-col { min-width: 64px; }
+  tr.eu .equipa-col { background: var(--destaque); font-weight: 700; }
+
+  /* Melhor e pior pontuacao de cada jornada, como no teu preenchimento. */
+  td.melhor { background: var(--bom); color: #fff; font-weight: 700; }
+  td.pior { background: var(--mau); color: #fff; font-weight: 700; }
+
+  tfoot td { background: var(--equipa); font-weight: 700; }
+  .legenda { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 14px; font-size: .78rem; color: var(--suave); }
+  .chip { display: inline-flex; align-items: center; gap: 6px; }
+  .quad { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+  .erro { padding: 12px 14px; border-radius: 8px; background: #fdecea; color: #8a2318; font-size: .85rem; margin-bottom: 14px; }
+  @media (prefers-color-scheme: dark) { .erro { background: #3b1f1b; color: #f3b5a8; } }
+</style>
+</head>
+<body>
+<div class="envolve">
+  <h1 id="titulo">Classificação por Jornada</h1>
+  <div class="sub" id="subtitulo">a carregar…</div>
+
+  <div class="barra">
+    <button id="btn-total" class="ativo">Pontos por jornada</button>
+    <button id="btn-acumulado">Total acumulado</button>
+    <button id="btn-atualizar">Atualizar ao vivo</button>
+    <span class="estado" id="estado"></span>
+  </div>
+
+  <div id="aviso"></div>
+
+  <div class="painel">
+    <div class="rolar">
+      <table id="tabela">
+        <thead><tr id="cabecalho"></tr></thead>
+        <tbody id="corpo"></tbody>
+        <tfoot id="rodape"></tfoot>
+      </table>
+    </div>
+  </div>
+
+  <div class="legenda">
+    <span class="chip"><span class="quad" style="background:var(--bom)"></span> melhor da jornada</span>
+    <span class="chip"><span class="quad" style="background:var(--mau)"></span> pior da jornada</span>
+    <span class="chip"><span class="quad" style="background:var(--destaque)"></span> a tua equipa</span>
+  </div>
+</div>
+
+<script>
+// A minha equipa, para ficar destacada na tabela.
+const EU = 22441;
+
+let dados = null;
+let modo = "jornada"; // "jornada" = pontos da jornada, "acumulado" = total corrido
+
+const $ = (id) => document.getElementById(id);
+
+async function carregar(aoVivo) {
+  const estado = $("estado");
+  try {
+    // Sem ?live, le o data.json embutido no deploy: mesma origem, sem CORS,
+    // funciona mesmo que a funcao serverless falhe ou nao exista.
+    const url = aoVivo ? `/api/standings?liga=1406` : `./data.json`;
+    estado.textContent = aoVivo ? "a contactar a Liga…" : "";
+    const resposta = await fetch(url, { cache: aoVivo ? "no-store" : "default" });
+    if (!resposta.ok) throw new Error(`HTTP ${resposta.status}`);
+    const json = await resposta.json();
+    if (json.erro) throw new Error(json.erro);
+    dados = json;
+    $("aviso").innerHTML = "";
+    desenhar();
+    estado.textContent = aoVivo ? "dados ao vivo" : "";
+  } catch (erro) {
+    estado.textContent = "";
+    if (aoVivo) {
+      // Falhar o refresh nao pode partir a pagina: fica o que ja estava.
+      $("aviso").innerHTML =
+        `<div class="erro">Não foi possível ir buscar dados ao vivo (${erro.message}). ` +
+        `A mostrar os dados do último deploy.</div>`;
+    } else {
+      $("aviso").innerHTML = `<div class="erro">Falha ao carregar data.json: ${erro.message}</div>`;
+    }
+  }
+}
+
+function desenhar() {
+  const totalJornadas = dados.total_jornadas || 34;
+  const jogadas = new Set(dados.jornadas_terminadas || []);
+
+  $("titulo").textContent = dados.nome_liga || "Classificação por Jornada";
+  const quando = dados.atualizado_em
+    ? new Date(dados.atualizado_em).toLocaleString("pt-PT")
+    : "—";
+  $("subtitulo").textContent =
+    `${dados.equipas.length} equipas · ${jogadas.size} de ${totalJornadas} jornadas jogadas · atualizado ${quando}`;
+
+  // Cabecalho: Equipa | J1..J34 | Total
+  const cab = ['<th class="equipa-col">Equipa e Treinador</th>'];
+  for (let j = 1; j <= totalJornadas; j++) cab.push(`<th>J${j}</th>`);
+  cab.push('<th class="total-col">Total</th>');
+  $("cabecalho").innerHTML = cab.join("");
+
+  // Ordena pelo total, do melhor para o pior.
+  const equipas = [...dados.equipas].sort((a, b) => b.total - a.total);
+
+  // Melhor e pior de cada jornada, para colorir as celulas.
+  const melhor = {}, pior = {};
+  for (let j = 1; j <= totalJornadas; j++) {
+    const valores = equipas
+      .map((e) => e.jornadas?.[j]?.pontos)
+      .filter((v) => typeof v === "number");
+    if (valores.length > 1) {
+      melhor[j] = Math.max(...valores);
+      pior[j] = Math.min(...valores);
+    }
+  }
+
+  const linhas = equipas.map((e) => {
+    const cel = [
+      `<td class="equipa-col">${escapar(e.equipa)} <span class="jogador">- ${escapar(e.jogador)}</span></td>`,
+    ];
+    for (let j = 1; j <= totalJornadas; j++) {
+      const g = e.jornadas?.[j];
+      if (!g) { cel.push('<td class="vazia"></td>'); continue; }
+      const valor = modo === "jornada" ? g.pontos : g.total;
+      let classe = "jornada";
+      // So faz sentido destacar melhor/pior nos pontos da propria jornada.
+      if (modo === "jornada" && melhor[j] !== undefined) {
+        if (g.pontos === melhor[j]) classe = "melhor";
+        else if (g.pontos === pior[j]) classe = "pior";
+      }
+      cel.push(`<td class="${classe}">${valor}</td>`);
+    }
+    cel.push(`<td class="total">${e.total}</td>`);
+    return `<tr class="${e.id_equipa === EU ? "eu" : ""}">${cel.join("")}</tr>`;
+  });
+  $("corpo").innerHTML = linhas.join("");
+
+  // Rodape: soma de todos os participantes por jornada.
+  const rod = ['<td class="equipa-col">Total</td>'];
+  for (let j = 1; j <= totalJornadas; j++) {
+    const soma = equipas.reduce((t, e) => t + (e.jornadas?.[j]?.pontos || 0), 0);
+    rod.push(`<td>${soma || ""}</td>`);
+  }
+  rod.push(`<td>${equipas.reduce((t, e) => t + e.total, 0)}</td>`);
+  $("rodape").innerHTML = `<tr>${rod.join("")}</tr>`;
+}
+
+function escapar(texto) {
+  const d = document.createElement("div");
+  d.textContent = texto ?? "";
+  return d.innerHTML;
+}
+
+$("btn-total").onclick = () => {
+  modo = "jornada";
+  $("btn-total").classList.add("ativo");
+  $("btn-acumulado").classList.remove("ativo");
+  desenhar();
+};
+$("btn-acumulado").onclick = () => {
+  modo = "acumulado";
+  $("btn-acumulado").classList.add("ativo");
+  $("btn-total").classList.remove("ativo");
+  desenhar();
+};
+$("btn-atualizar").onclick = async (ev) => {
+  ev.target.disabled = true;
+  await carregar(true);
+  ev.target.disabled = false;
+};
+
+carregar(false);
+</script>
+</body>
+</html>

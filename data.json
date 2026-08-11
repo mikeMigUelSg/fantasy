@@ -1,0 +1,154 @@
+{
+ "id_liga": 1406,
+ "nome_liga": "Liga dos Últimos",
+ "atualizado_em": "2026-08-11T11:25:22Z",
+ "total_jornadas": 34,
+ "jornadas_terminadas": [
+  1
+ ],
+ "equipas": [
+  {
+   "id_equipa": 5538,
+   "equipa": "Porto Team",
+   "jogador": "Pedro Lopes",
+   "posicao": 1,
+   "total": 62,
+   "jornadas": {
+    "1": {
+     "pontos": 62,
+     "total": 62
+    }
+   }
+  },
+  {
+   "id_equipa": 17068,
+   "equipa": "Máximo assente",
+   "jogador": "diogo couto",
+   "posicao": 2,
+   "total": 53,
+   "jornadas": {
+    "1": {
+     "pontos": 53,
+     "total": 53
+    }
+   }
+  },
+  {
+   "id_equipa": 26,
+   "equipa": "Mau Feitio FC",
+   "jogador": "Fernando Santos",
+   "posicao": 3,
+   "total": 50,
+   "jornadas": {
+    "1": {
+     "pontos": 50,
+     "total": 50
+    }
+   }
+  },
+  {
+   "id_equipa": 9541,
+   "equipa": "Cinco Violinos FC",
+   "jogador": "Gonçalo Freire",
+   "posicao": 4,
+   "total": 46,
+   "jornadas": {
+    "1": {
+     "pontos": 46,
+     "total": 46
+    }
+   }
+  },
+  {
+   "id_equipa": 5006,
+   "equipa": "Joao Araujo",
+   "jogador": "João Araújo",
+   "posicao": 5,
+   "total": 45,
+   "jornadas": {
+    "1": {
+     "pontos": 45,
+     "total": 45
+    }
+   }
+  },
+  {
+   "id_equipa": 5632,
+   "equipa": "DONKED",
+   "jogador": "Diogo Correia",
+   "posicao": 6,
+   "total": 44,
+   "jornadas": {
+    "1": {
+     "pontos": 44,
+     "total": 44
+    }
+   }
+  },
+  {
+   "id_equipa": 13748,
+   "equipa": "Up the Irons!",
+   "jogador": "Jorge Oliveira",
+   "posicao": 7,
+   "total": 43,
+   "jornadas": {
+    "1": {
+     "pontos": 43,
+     "total": 43
+    }
+   }
+  },
+  {
+   "id_equipa": 12206,
+   "equipa": "Brigada das Febras",
+   "jogador": "Helder Fonseca",
+   "posicao": 8,
+   "total": 40,
+   "jornadas": {
+    "1": {
+     "pontos": 40,
+     "total": 40
+    }
+   }
+  },
+  {
+   "id_equipa": 5613,
+   "equipa": "Henriques team",
+   "jogador": "joao henriques",
+   "posicao": 9,
+   "total": 36,
+   "jornadas": {
+    "1": {
+     "pontos": 36,
+     "total": 36
+    }
+   }
+  },
+  {
+   "id_equipa": 5673,
+   "equipa": "Cavaleiro Team",
+   "jogador": "Diogo Cavaleiro",
+   "posicao": 9,
+   "total": 36,
+   "jornadas": {
+    "1": {
+     "pontos": 36,
+     "total": 36
+    }
+   }
+  },
+  {
+   "id_equipa": 22441,
+   "equipa": "Miguel",
+   "jogador": "Miguel Ferreira",
+   "posicao": 11,
+   "total": 19,
+   "jornadas": {
+    "1": {
+     "pontos": 19,
+     "total": 19
+    }
+   }
+  }
+ ]
+}
