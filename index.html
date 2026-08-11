@@ -264,7 +264,7 @@ async function carregar(aoVivo) {
     // Sem ?live, le o data.json embutido no deploy: mesma origem, sem CORS,
     // funciona mesmo que a funcao serverless falhe ou nao exista.
     const url = aoVivo ? `/api/standings?liga=1406` : `./data.json`;
-    estado.textContent = aoVivo ? "a contactar a Liga…" : "";
+    estado.textContent = "";
     const resposta = await fetch(url, { cache: aoVivo ? "no-store" : "default" });
     if (!resposta.ok) throw new Error(`HTTP ${resposta.status}`);
     const json = await resposta.json();
