@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Liga dos Últimos — Classificação por Jornada</title>
+<title>Liga dos Últimos — Classificacoes</title>
 
 <link rel="icon" href="./favicon.ico" sizes="any" />
 <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
@@ -115,8 +115,7 @@
   /* Figura heroi: fonte do sistema, figuras proporcionais (nao tabular). */
   .pote-valor { font-size: 3rem; font-weight: 700; line-height: 1.1; margin-top: 2px; }
   .pote-nota { font-size: .85rem; color: var(--suave); margin-top: 4px; }
-  .titulo-grafico { font-size: 1rem; margin: 26px 0 2px; }
-  .nota-grafico { font-size: .82rem; color: var(--suave); margin: 0 0 14px; }
+  .titulo-grafico { font-size: 1rem; margin: 26px 0 14px; }
 
   /* Barras em HTML: uma grelha de [rotulo | barra | valor]. */
   .barras { display: grid; grid-template-columns: minmax(120px, 210px) 1fr auto; gap: 7px 12px; align-items: center; }
@@ -215,7 +214,6 @@
     <span class="chip"><span class="quad" style="background:var(--bom)"></span> melhor da jornada</span>
     <span class="chip"><span class="quad" style="background:var(--mau)"></span> pior da jornada</span>
     <span class="chip"><span class="quad" style="background:var(--paga)"></span> 4 piores — pagam 1 € cada</span>
-    <span class="chip"><span class="quad" style="background:var(--destaque)"></span> a tua equipa</span>
   </div>
 
   <section class="pote">
@@ -227,17 +225,14 @@
       </div>
     </div>
 
-    <h2 class="titulo-grafico">Contribuição de cada um</h2>
-    <p class="nota-grafico" id="nota-grafico">
-      Em cada jornada, os 4 piores classificados põem 1 € no pote.
-    </p>
+    <h2 class="titulo-grafico">COntribuicoes individuais</h2>
     <div id="grafico"></div>
 
     <details class="tabela-alt">
       <summary>Ver como tabela</summary>
       <div class="rolar">
         <table class="mini">
-          <thead><tr><th class="equipa-col">Equipa</th><th>Jornadas pagas</th><th>Contribuição</th></tr></thead>
+          <thead><tr><th class="equipa-col">Equipa</th><th>Jornadas pagas</th><th>Contribuicao</th></tr></thead>
           <tbody id="corpo-pote"></tbody>
         </table>
       </div>
@@ -342,9 +337,6 @@ function desenharPote(equipas, totalJornadas) {
   // errada de que alguem lidera; a barra cheia passa a significar "pagou em
   // todas as jornadas".
   const maximo = Math.max(jogadas * EUROS_POR_JORNADA, ...contribs.map((c) => c.euros));
-  $("nota-grafico").textContent =
-    `Em cada jornada, os ${QUANTOS_PAGAM} piores classificados põem ${EUROS_POR_JORNADA} € no pote. ` +
-    `Barra cheia = pagou nas ${jogadas} jornada${jogadas === 1 ? "" : "s"} já jogada${jogadas === 1 ? "" : "s"}.`;
   $("grafico").innerHTML =
     '<div class="barras">' +
     contribs
