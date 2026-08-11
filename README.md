@@ -80,11 +80,43 @@ Alternativa: não regenerar nada e usar o botão "Atualizar ao vivo", que vai
 buscar dados frescos pela função serverless (com cache de 5 minutos no CDN,
 para não martelar o servidor da Liga).
 
+## O pote
+
+Regra: **em cada jornada, os 4 piores classificados põem 1 € no pote.**
+
+Na tabela, esses 4 ficam a **vermelho claro**. O pior de todos leva o vermelho
+forte por cima (é sempre um dos 4 que paga), e o melhor da jornada leva verde.
+
+Por baixo aparece o **Pote Acumulado** e um gráfico com a contribuição de cada
+um, ordenado de quem mais pagou para quem menos pagou.
+
+**Empates:** pagam sempre exatamente 4 por jornada. Se houver empate na
+pontuação, desempata pelo total acumulado da época — quem tem menos total fica
+mais abaixo e paga primeiro. Sem esta segunda chave, a ordem dependeria da
+ordem de chegada dos dados e o pote mudava sozinho entre atualizações.
+
+O gráfico está escalado ao **máximo possível** (1 € por jornada jogada), não ao
+maior valor observado. É de propósito: enquanto só houver uma jornada está toda
+a gente empatada a 1 €, e uma escala relativa mostraria quatro barras cheias a
+dar a ideia errada de que alguém lidera. Assim, barra cheia significa "pagou em
+todas as jornadas" — e as barras vão-se diferenciando à medida que a época
+avança.
+
+Para mudar as regras, edita as constantes no topo do `<script>` em
+`index.html`:
+
+```js
+const QUANTOS_PAGAM = 4;        // quantos pagam por jornada
+const EUROS_POR_JORNADA = 1;    // quanto paga cada um
+```
+
 ## A interface
 
 - **Pontos por jornada** / **Total acumulado** — alterna o que cada célula
   mostra: os pontos daquela jornada, ou o acumulado até ali.
-- **Verde** é a melhor pontuação da jornada, **vermelho** a pior.
+- **Verde** é a melhor pontuação da jornada, **vermelho** a pior, **vermelho
+  claro** os 4 que pagam.
+- O gráfico tem um **"Ver como tabela"** para quem não distingue as cores.
 - A tua equipa (id `22441`) fica destacada a amarelo. Para mudar, edita a
   constante `EU` no topo do `<script>` em `index.html`.
 - A coluna das equipas fica fixa ao rolar na horizontal — necessário, porque 34

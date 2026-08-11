@@ -4,6 +4,16 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Liga dos Últimos — Classificação por Jornada</title>
+
+<link rel="icon" href="./favicon.ico" sizes="any" />
+<link rel="apple-touch-icon" href="./apple-touch-icon.png" />
+<meta name="theme-color" content="#0d0d0d" />
+
+<meta property="og:title" content="Liga dos Últimos — Classificação por Jornada" />
+<meta property="og:description" content="Classificação jornada a jornada e o pote acumulado: os 4 piores de cada jornada pagam 1 €." />
+<meta property="og:image" content="./og.png" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary_large_image" />
 <style>
   :root {
     --fundo: #f4f6f8;
@@ -46,8 +56,10 @@
     font-family: "Source Sans 3", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   }
   .envolve { max-width: 1600px; margin: 0 auto; }
+  .cabecalho { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; }
+  .logo { width: 72px; height: 72px; flex-shrink: 0; display: block; }
   h1 { font-size: 1.5rem; margin: 0 0 4px; letter-spacing: -0.01em; }
-  .sub { color: var(--suave); font-size: .875rem; margin-bottom: 18px; }
+  .sub { color: var(--suave); font-size: .875rem; }
   .barra { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 16px; }
   button {
     font: inherit; font-size: .85rem; padding: 7px 14px; cursor: pointer;
@@ -127,12 +139,58 @@
   table.mini th, table.mini td { border-right: none; padding: 6px 14px 6px 0; text-align: left; background: none; }
   table.mini thead th { background: none; position: static; }
   table.mini .equipa-col { position: static; background: none; min-width: 0; }
+
+  /* --- Telemovel --------------------------------------------------------
+     Tres problemas reais no ecra pequeno, medidos a 390px:
+     1. a coluna fixa das equipas comia 248 dos 390px, sobrando espaco para
+        duas jornadas -- passa a ser mais estreita e o nome do treinador vai
+        para uma segunda linha;
+     2. as barras do grafico ficavam com poucos pixeis porque o rotulo levava
+        208px -- o rotulo passa para cima da barra, que fica a toda a largura;
+     3. os botoes tinham 32px de altura, abaixo do minimo confortavel para o
+        dedo (~44px). */
+  @media (max-width: 640px) {
+    body { padding: 16px 12px 48px; }
+    .cabecalho { gap: 11px; margin-bottom: 16px; }
+    .logo { width: 54px; height: 54px; }
+    h1 { font-size: 1.2rem; }
+    .sub { font-size: .8rem; }
+
+    /* Alvos de toque maiores; os botoes de modo dividem a linha ao meio. */
+    button { padding: 11px 14px; font-size: .84rem; min-height: 44px; }
+    #btn-total, #btn-acumulado { flex: 1; }
+    #btn-atualizar { flex-basis: 100%; }
+
+    table { font-size: .78rem; }
+    th, td { padding: 6px 7px; }
+    .equipa-col { min-width: 0; width: 132px; max-width: 132px; white-space: normal; line-height: 1.25; }
+    /* O nome do treinador desce para a sua propria linha, em vez de esticar
+       a coluna ou ser cortado a meio. */
+    .jogador { display: block; font-size: .72rem; }
+    th.total-col { min-width: 52px; }
+
+    .pote { padding: 18px 16px 20px; }
+    .pote-valor { font-size: 2.4rem; }
+
+    /* Grafico: rotulo por cima, barra a toda a largura. */
+    .barras { grid-template-columns: 1fr; gap: 0; }
+    .b-linha { display: block !important; padding: 9px 0; border-bottom: 1px solid var(--linha); }
+    .b-linha:last-child { border-bottom: none; }
+    .b-nome { text-align: left; margin-bottom: 5px; white-space: normal; }
+    .b-carril { height: 16px; }
+    .b-valor { min-width: 0; margin-top: 4px; font-size: .78rem; }
+  }
 </style>
 </head>
 <body>
 <div class="envolve">
-  <h1 id="titulo">Classificação por Jornada</h1>
-  <div class="sub" id="subtitulo">a carregar…</div>
+  <header class="cabecalho">
+    <img src="./logo.png" alt="Liga dos Últimos" class="logo" width="72" height="72" />
+    <div>
+      <h1 id="titulo">Classificação por Jornada</h1>
+      <div class="sub" id="subtitulo">a carregar…</div>
+    </div>
+  </header>
 
   <div class="barra">
     <button id="btn-total" class="ativo">Pontos por jornada</button>
@@ -170,7 +228,7 @@
     </div>
 
     <h2 class="titulo-grafico">Contribuição de cada um</h2>
-    <p class="nota-grafico">
+    <p class="nota-grafico" id="nota-grafico">
       Em cada jornada, os 4 piores classificados põem 1 € no pote.
     </p>
     <div id="grafico"></div>
@@ -278,7 +336,15 @@ function desenharPote(equipas, totalJornadas) {
     return;
   }
 
-  const maximo = Math.max(...contribs.map((c) => c.euros));
+  // A escala vai ate ao maximo possivel (1 EUR por jornada jogada), nao ate ao
+  // maior valor observado. Assim, quando toda a gente esta empatada -- o caso
+  // da primeira jornada -- as barras nao aparecem todas cheias a dar a ideia
+  // errada de que alguem lidera; a barra cheia passa a significar "pagou em
+  // todas as jornadas".
+  const maximo = Math.max(jogadas * EUROS_POR_JORNADA, ...contribs.map((c) => c.euros));
+  $("nota-grafico").textContent =
+    `Em cada jornada, os ${QUANTOS_PAGAM} piores classificados põem ${EUROS_POR_JORNADA} € no pote. ` +
+    `Barra cheia = pagou nas ${jogadas} jornada${jogadas === 1 ? "" : "s"} já jogada${jogadas === 1 ? "" : "s"}.`;
   $("grafico").innerHTML =
     '<div class="barras">' +
     contribs
